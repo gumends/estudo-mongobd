@@ -9,24 +9,28 @@ const DBClient = new MongoClient(MONGODB_URL);
 const DB = DBClient.db(MONGO_DB);
 const processCollection = DB.collection(MONGO_COLLECTION);
 
-let find = { '_id': new ObjectId("672ffa48ab6bfdf734822a46") };
-
-async function run() {
+// Função para inserir um documento
+async function insertData(data) {
     try {
         await DBClient.connect();
-
-        const findResult = await processCollection.find(find).toArray();
-
-        const results = findResult.map(process => ({
-            nome: process.nome,
-        }));
-
-        console.log(results);
+        await processCollection.insertOne(data)
+            .then((results) => {
+                console.log(`Inserido com sucesso: ${results.acknowledged}`);
+            })
     } catch (error) {
-        console.error('Erro ao buscar no MongoDB:', error);
+        console.error('Erro ao inserir no MongoDB:', error);
     } finally {
         await DBClient.close();
     }
+}
+
+
+// Execução das funções
+async function run() {
+    const newData = {
+        nome: 'Thamyres Tatiana Bessa',
+    };
+    await insertData(newData);
 }
 
 run();
